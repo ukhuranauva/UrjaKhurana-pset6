@@ -1,9 +1,12 @@
 package com.example.urja.urjakhurana_pset6;
 
-import android.graphics.Bitmap;
+/* The Concert object consist of all the information that is relevant for the user regarding a
+ * concert. So that is the id, url, artist, location, type of concert and date for example.
+ */
 
 public class Concert {
 
+    // initialize all variables
     String id;
     String url;
     String artist;
@@ -15,10 +18,16 @@ public class Concert {
     String date;
     String time;
     String venue;
-    Bitmap image;
+    // url of image
+    String image;
 
+    // constructor with no arguments for when the data is fetched from Firebase
+    public Concert() {
+    }
+
+    // constructor for when a new object has to be made with all of the information
     public Concert(String id, String url, String artist, String concertName, String city, String
-                   country, String segment, String genre, String date, String time, String venue, Bitmap image) {
+                   country, String segment, String genre, String date, String time, String venue, String image) {
         this.id = id;
         this.url = url;
         this.artist = artist;

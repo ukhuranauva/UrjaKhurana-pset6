@@ -7,7 +7,10 @@ import android.os.AsyncTask;
 import java.io.InputStream;
 import java.net.URL;
 
-//http://stackoverflow.com/questions/5776851/load-image-from-url
+/* With the ImageAsyncTask, given a url of an image, the image is fetched in BMP form. Got help from
+ * the following link: //http://stackoverflow.com/questions/5776851/load-image-from-url
+ */
+
 public class ImageAsyncTask  extends AsyncTask<String, Bitmap, Bitmap> {
 
     protected Bitmap doInBackground(String... params) {

@@ -1,5 +1,8 @@
 package com.example.urja.urjakhurana_pset6;
 
+/* The HTTPRequestHelper makes a call to the API to get the request and get corresponding
+ * information, according to the given artist name by the user in the main activity. */
+
 import android.util.Log;
 
 import java.net.URL;
@@ -11,19 +14,22 @@ import java.io.IOException;
 
 public class HTTPRequestHelper {
 
+    // gets result of request to api
     protected static synchronized String downloadFromServer(String... params) {
         // initialize string for result
         String result = "";
         // one part of the url
-        String url1 = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=thqTCO7jvSwCAsQ9Z4w6M4Ga3OMISAA7&keyword=";
+        String url1 = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=thqTCO7jvSw" +
+                "CAsQ9Z4w6M4Ga3OMISAA7&keyword=";
         // second part of url
         String url2 = "&city=amsterdam";
-        // get movie name
+        // get name of artist
         String title = params[0];
         // combine url to get the right search url
         String completeUrl = url1 + title + url2;
         URL url = null;
 
+        // change string of url into a real URL for the request
         try {
             url = new URL(completeUrl);
         } catch (MalformedURLException e) {
