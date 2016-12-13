@@ -18,13 +18,11 @@
         android:id="@+id/concertName" />
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         app:srcCompat="@android:drawable/title_bar"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/concertName"
-        android:maxWidth="100dp"
-        android:maxHeight="100dp"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:layout_marginLeft="10dp"

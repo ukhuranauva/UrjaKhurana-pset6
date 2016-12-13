@@ -1,13 +1,200 @@
 package com.example.urja.urjakhurana_pset6;
 
+import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 
 public class UserSavedActivity extends AppCompatActivity {
+
+    ArrayList<Concert> concertList;
+    ArrayList<String> keyList;
+    ListView concertView;
+    ConcertAdapter adapter;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    DatabaseReference myRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_saved);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.user_toolbar);
+        setSupportActionBar(myToolbar);
+        concertList = new ArrayList<>();
+        keyList = new ArrayList<>();
+        concertView = (ListView) findViewById(R.id.concertView);
+        // get the lists from the file and set the taskManager with it
+        // get listview and set adapter
+        registerForContextMenu(concertView);
+        adapter = new ConcertAdapter(this, R.layout.row_layout, concertList);
+        concertView.setAdapter(adapter);
+        setListeners();
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d("k", "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d("n", "onAuthStateChanged:signed_out");
+                }
+                // ...
+            }
+        };
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        String userId = getCurrentUser();
+        myRef = database.getReference("users").child(userId);
+
+        // Read from the database
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                Log.d("HOI IK GA ER IN", "HOPELIJK NIET WEER");
+                concertList.clear();
+                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                    String key = snapshot.getKey();
+                    Concert concert = snapshot.getValue(Concert.class);
+                    keyList.add(key);
+                    concertList.add(concert);
+                    Log.d("heeke", concert.artist);
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("sksksk", "Failed to read value.", error.toException());
+            }
+        });
+    }
+
+    public void setListeners() {
+
+        // just a simple toast if short click
+        concertView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            // get page of movie by clicking on one of the movie names
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(), "long click for options", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public String getCurrentUser() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = "";
+        if (user != null) {
+            // Name, email address, and profile photo Url
+            // The user's ID, unique to the Firebase project. Do NOT use this value to
+            // authenticate with your backend server, if you have one. Use
+            // FirebaseUser.getToken() instead.
+            uid = user.getUid();
+        }
+        return uid;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_item, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        Concert concert;
+        switch (item.getItemId()) {
+            case R.id.action_favorite:
+                Log.d("hello", Long.toString(info.id));
+                Log.d("concerts", Arrays.toString(concertList.toArray()));
+                Log.d("keys", Arrays.toString(keyList.toArray()));
+                concert = concertList.get((int) info.id);
+                String key = keyList.get((int) info.id);
+                myRef.child(key).removeValue();
+                adapter.remove(concert);
+                concertList.remove(concert);
+                adapter.notifyDataSetChanged();
+                Log.d("listen", "i'm pised");
+                return true;
+            case R.id.action_settings:
+                Log.d("hello", Long.toString(info.id));
+                concert = concertList.get((int) info.id);
+                String url = concert.url;
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, url);
+                sendIntent.setType("text/plain");
+                startActivity(Intent.createChooser(sendIntent, "Choose an application to share"));
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.toolbar_items, menu);
+        MenuItem signout = menu.findItem(R.id.action_signout);
+        MenuItem search = menu.findItem(R.id.action_search);
+        signout.setVisible(true);
+        search.setVisible(true);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_signout:
+                FirebaseAuth.getInstance().signOut();
+                // reset options because user signed out
+                invalidateOptionsMenu();
+                finish();
+                return true;
+
+            case R.id.action_search:
+                // go to saved concerts;
+                Intent goToSaved = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(goToSaved);
+                finish();
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

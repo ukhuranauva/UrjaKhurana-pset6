@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     ListView concertView;
     ConcertAdapter adapter;
     ArrayList<Concert> concertList;
-    AlertDialog dialog;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     DatabaseReference myRef;
@@ -46,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
-        invalidateOptionsMenu();
         concertList = new ArrayList<>();
         concertView = (ListView) findViewById(R.id.concertView);
         // get the lists from the file and set the taskManager with it
