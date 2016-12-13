@@ -1,6 +1,6 @@
 Peer review done with Putri <br/>
 -names (4):
-*names are clear and consistent
+*names are clear and consistent.
 
 -headers (1):
 *there are no headers
