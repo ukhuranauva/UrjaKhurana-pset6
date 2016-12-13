@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,9 +19,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -29,7 +28,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -46,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+        invalidateOptionsMenu();
         concertList = new ArrayList<>();
         concertView = (ListView) findViewById(R.id.concertView);
         // get the lists from the file and set the taskManager with it
@@ -123,6 +124,57 @@ public class MainActivity extends AppCompatActivity {
         return uid;
     }
 
+
+
+    //http://stackoverflow.com/questions/10692755/how-do-i-hide-a-menu-item-in-the-actionbar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.toolbar_items, menu);
+        MenuItem account = menu.findItem(R.id.action_account);
+        MenuItem signout = menu.findItem(R.id.action_signout);
+        MenuItem savedConcerts = menu.findItem(R.id.action_saved);
+        if (getCurrentUser().equals("")) {
+            account.setVisible(true);
+            signout.setVisible(false);
+            savedConcerts.setVisible(false);
+        } else {
+            account.setVisible(false);
+            signout.setVisible(true);
+            savedConcerts.setVisible(true);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_account:
+                // log in or make account
+                Intent sendIntent = new Intent(getApplicationContext(), AccountActivity.class);
+                startActivity(sendIntent);
+                return true;
+
+            case R.id.action_signout:
+                FirebaseAuth.getInstance().signOut();
+                // reset options because user signed out
+                invalidateOptionsMenu();
+                return true;
+
+            case R.id.action_saved:
+                // go to saved concerts;
+                Intent goToSaved = new Intent(getApplicationContext(), UserSavedActivity.class);
+                startActivity(goToSaved);
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
@@ -139,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_favorite:
                 Log.d("hello", Long.toString(info.id));
                 concert = concertList.get((int) info.id);
-                String userId = getCurrentUser();
                 myRef.push().setValue(concert);
                 Log.d("listen", "i'm pised");
                 return true;
