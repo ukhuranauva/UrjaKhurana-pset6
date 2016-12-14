@@ -48,6 +48,8 @@ public class AccountActivity extends AppCompatActivity {
         };
     }
 
+
+
     // creates new account
     public void createAccount(View view) {
         // get email and password typed in by user
@@ -61,13 +63,12 @@ public class AccountActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d("k", "createUserWithEmail:onComplete:" + task.isSuccessful());
 
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
+                        // if creating an account is not succesful
                         if (!task.isSuccessful()) {
                             Toast.makeText(getApplicationContext(), "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
+                            // if creating an account is succesful, go back to the main activity
                             Toast.makeText(getApplicationContext(), "Authentication Succesful.",
                                     Toast.LENGTH_SHORT).show();
                             Intent sendIntent = new Intent(getApplicationContext(), MainActivity.class);
@@ -91,14 +92,12 @@ public class AccountActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d("dd", "signInWithEmail:onComplete:" + task.isSuccessful());
 
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
+                        // if sign in  failed
                         if (!task.isSuccessful()) {
                             Log.w("ddd", "signInWithEmail", task.getException());
                             Toast.makeText(getApplicationContext(), "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                        }
+                        } // if sign in is succesful go back to the main activity
                         else {
                             Toast.makeText(getApplicationContext(), "Authentication Succesful.",
                                     Toast.LENGTH_SHORT).show();

@@ -38,44 +38,38 @@ public class EventAsyncTask extends AsyncTask<String, Integer, String> {
         super.onPostExecute(result);
         ArrayList<Concert> concerts = new ArrayList<>();
         Concert concert;
-        // if nothing is found
-        if (result.equals("{\"Response\":\"False\",\"Error\":\"Movie not found!\"}")) {
-            Toast.makeText(context, "No data was found", Toast.LENGTH_SHORT).show();
-            // close screen since no results
-            this.activity.finish();
-        } else {
-            try {
+        JSONObject readObj;
+        try {
+            readObj = new JSONObject(result);
+            // if there are results (the tag _embedded has all of the results in the json file)
+            if (readObj.has("_embedded")) {
                 // get all the information of the movie from the json file
-                JSONObject readObj = new JSONObject(result);
-                JSONObject embObj = readObj.getJSONObject("_embedded");
-                JSONArray eventArray = embObj.getJSONArray("events");
+                JSONArray eventArray = readObj.getJSONObject("_embedded").getJSONArray("events");
                 // for each concert, get all the information and add it to the list of concerts
                 for(int i = 0; i < eventArray.length(); i++) {
+                    // get a concert and all of its needed information
                     JSONObject eventObj = eventArray.getJSONObject(i);
                     String title = eventObj.getString("name");
                     String id = eventObj.getString("id");
                     String url = eventObj.getString("url");
                     JSONArray images = eventObj.getJSONArray("images");
-                    JSONObject imageEvent = images.getJSONObject(0);
-                    String imageUrl = imageEvent.getString("url");
-                    JSONObject datesObj = eventObj.getJSONObject("dates");
-                    JSONObject dates = datesObj.getJSONObject("start");
+                    String imageUrl = images.getJSONObject(0).getString("url");
+                    // get all the data regarding date and time
+                    JSONObject dates = eventObj.getJSONObject("dates").getJSONObject("start");
                     String date = dates.getString("localDate");
                     String time;
+                    // check if event has a time (because some don't)
                     if(dates.has("localTime")) {
                         time = dates.getString("localTime");
                     } else {
                         time = "undefined";
                     }
-                    JSONArray genres = eventObj.getJSONArray("classifications");
-                    JSONObject genresObj = genres.getJSONObject(0);
-                    JSONObject segmentObj = genresObj.getJSONObject("segment");
-                    String segment = segmentObj.getString("name");
-                    JSONObject genreObj = genresObj.getJSONObject("genre");
-                    String genre = genreObj.getString("name");
+                    JSONObject genres = eventObj.getJSONArray("classifications").getJSONObject(0);
+                    String segment = genres.getJSONObject("segment").getString("name");
+                    String genre = genres.getJSONObject("genre").getString("name");
+                    // get extra details of the concert
                     JSONObject detailsObj = eventObj.getJSONObject("_embedded");
-                    JSONArray venues = detailsObj.getJSONArray("venues");
-                    JSONObject venueObj = venues.getJSONObject(0);
+                    JSONObject venueObj = detailsObj.getJSONArray("venues").getJSONObject(0);
                     String venue;
                     // if venue has a name, get it or else set it equal to undefined
                     if(venueObj.has("name")) {
@@ -83,23 +77,22 @@ public class EventAsyncTask extends AsyncTask<String, Integer, String> {
                     } else {
                         venue = "undefined";
                     }
-                    JSONObject cityObj = venueObj.getJSONObject("city");
-                    String city = cityObj.getString("name");
-                    JSONObject countryObj = venueObj.getJSONObject("country");
-                    String country = countryObj.getString("countryCode");
-                    JSONArray attractions = detailsObj.getJSONArray("attractions");
-                    JSONObject attractionObj = attractions.getJSONObject(0);
-                    String artist = attractionObj.getString("name");
+                    String city = venueObj.getJSONObject("city").getString("name");
+                    String country = venueObj.getJSONObject("country").getString("countryCode");
+                    String artist = detailsObj.getJSONArray("attractions").getJSONObject(0)
+                                                                        .getString("name");
                     // create new Concert object and add it to the list of concerts
                     concert = new Concert(id, url, artist, title, city, country, segment, genre,
                             date, time, venue, imageUrl);
                     concerts.add(concert);
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+                // Puts all of the concerts retrieved in a proper way for the user
+                this.activity.setData(concerts);
+            } else {
+                Toast.makeText(context, "No concerts were found", Toast.LENGTH_SHORT).show();
             }
-            // Puts all of the concerts retrieved in a proper way for the user
-            this.activity.setData(concerts);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }

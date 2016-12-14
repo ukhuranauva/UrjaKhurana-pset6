@@ -22,6 +22,7 @@
         android:layout_marginTop ="-17dp"
         android:layout_marginLeft="-17dp"
         android:layout_marginRight="-17dp"
+        app:titleTextColor="#F5F5F5"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
@@ -36,6 +37,7 @@
         android:inputType="textPersonName"
         android:textColorHint="#F5F5F5"
         android:textColor="#F5F5F5"
+        android:textColorHighlight="#F5F5F5"
         android:hint="type in an artist...."
         android:id="@+id/searchEvent" />
 

@@ -1,6 +1,5 @@
 package com.example.urja.urjakhurana_pset6;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,17 +20,19 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-
+/* In the MainActivity a user can search for concerts by their favorite artist, regardless of being
+ *  signed in or not. However, being signed in has its' perks because then you can not only share
+ *  an event with your friends, but you can also save the concerts! When a user is not signed in
+ *  you can share events, however you cannot save any concerts.
+ */
 public class MainActivity extends AppCompatActivity {
 
+    // initialize variables
     ListView concertView;
     ConcertAdapter adapter;
     ArrayList<Concert> concertList;
@@ -43,16 +44,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // set toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+
+        // assign values to initialized variables
         concertList = new ArrayList<>();
         concertView = (ListView) findViewById(R.id.concertView);
-        // get the lists from the file and set the taskManager with it
-        // get listview and set adapter
-        registerForContextMenu(concertView);
         adapter = new ConcertAdapter(this, R.layout.row_layout, concertList);
         concertView.setAdapter(adapter);
+        // add listener for list view
         setListeners();
+        // get the floating context menu for the listview items
+        registerForContextMenu(concertView);
+
+        // initialize firebase authentication
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -69,37 +76,22 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        // Write a message to the database
+        // get firebase database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
+        // get user id
         String userId = getCurrentUser();
+        // get the right path of the user to perform operations on their own database
         myRef = database.getReference("users").child(userId);
-
-        // Read from the database
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
-                    Concert concert = snapshot.getValue(Concert.class);
-                    Log.d("heeke", concert.artist);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w("sksksk", "Failed to read value.", error.toException());
-            }
-        });
     }
 
+    // add listener for authentication of account on start
     @Override
     public void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
     }
 
+    // remove listener for authentication of account when app is stopped
     @Override
     public void onStop() {
         super.onStop();
@@ -108,15 +100,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    // get user id of the current user
     public String getCurrentUser() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String uid = "";
         if (user != null) {
-            // Name, email address, and profile photo Url
-            // The user's ID, unique to the Firebase project. Do NOT use this value to
-            // authenticate with your backend server, if you have one. Use
-            // FirebaseUser.getToken() instead.
+            // get user id of the current user
             uid = user.getUid();
         }
         return uid;
@@ -124,19 +113,30 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    //http://stackoverflow.com/questions/10692755/how-do-i-hide-a-menu-item-in-the-actionbar
+    /* Was able to solve this with a bit of help from the following link:
+     * http://stackoverflow.com/questions/10692755/how-do-i-hide-a-menu-item-in-the-actionbar
+     * Checks if a user is logged in or not, depending on that it displays the right options in
+     * the menu
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // inflate the menu
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.toolbar_items, menu);
+
+        // get all of the items
         MenuItem account = menu.findItem(R.id.action_account);
         MenuItem signout = menu.findItem(R.id.action_signout);
         MenuItem savedConcerts = menu.findItem(R.id.action_saved);
+
+        // if no one is signed in
         if (getCurrentUser().equals("")) {
+            // hide sign out and saved concerts and show log in/sign up button
             account.setVisible(true);
             signout.setVisible(false);
             savedConcerts.setVisible(false);
         } else {
+            // if user is signed in, show signout button and saved concerts and hide log in/sign up
             account.setVisible(false);
             signout.setVisible(true);
             savedConcerts.setVisible(true);
@@ -144,35 +144,41 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    // this function is for when one of the items in the toolbar is tapped on by the user
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            // log in or make account
             case R.id.action_account:
-                // log in or make account
+                // go to activity to sign in or sign up
                 Intent sendIntent = new Intent(getApplicationContext(), AccountActivity.class);
                 startActivity(sendIntent);
                 return true;
 
+            // sign out
             case R.id.action_signout:
                 FirebaseAuth.getInstance().signOut();
                 // reset options because user signed out
                 invalidateOptionsMenu();
                 return true;
 
+            // display saved concerts
             case R.id.action_saved:
-                // go to saved concerts;
+                // go to activity to show saved concerts;
                 Intent goToSaved = new Intent(getApplicationContext(), UserSavedActivity.class);
                 startActivity(goToSaved);
+                finish();
                 return true;
 
+            // when user's action is not recognized
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
+                // invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
         }
     }
 
 
+    // inflate the floating context menu for the listview items
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
@@ -181,27 +187,39 @@ public class MainActivity extends AppCompatActivity {
         inflater.inflate(R.menu.menu_item, menu);
     }
 
+    // when one of the options of the context menu are tapped on
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        // get the proper item that was tapped on
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Concert concert;
+
+        // depending on which options was tapped
         switch (item.getItemId()) {
+            // save concert
             case R.id.action_favorite:
                 Log.d("hello", Long.toString(info.id));
+                // get which concert it is and save it to database
                 concert = concertList.get((int) info.id);
                 myRef.push().setValue(concert);
                 Log.d("listen", "i'm pised");
                 return true;
+
+            // share option
             case R.id.action_settings:
                 Log.d("hello", Long.toString(info.id));
+                // get the concert and its url on the website
                 concert = concertList.get((int) info.id);
                 String url = concert.url;
+                // get which app user wants to use for sharing the url and share it there
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, url);
                 sendIntent.setType("text/plain");
                 startActivity(Intent.createChooser(sendIntent, "Choose an application to share"));
                 return true;
+
+            // if user's option is not properly recognized
             default:
                 return super.onContextItemSelected(item);
         }
@@ -211,14 +229,22 @@ public class MainActivity extends AppCompatActivity {
     public void searchEvent(View view) {
         EditText eventName = (EditText) findViewById(R.id.searchEvent);
         String artist = eventName.getText().toString();
+
+        // refresh the searchbar for the next search of the user
         eventName.setText("");
+
         Context context = getApplicationContext();
-        // hide keyboard: http://stackoverflow.com/questions/2342620/how-to-hide-keyboard-after-typing-in-edittext-in-android
+
+        /* Made use of http://stackoverflow.com/questions/2342620/how-to-hide-keyboard-after-
+         * typing-in-edittext-in-android to hide the keyboard after an event is searched for. this
+         * is done for user convenience
+         */
         InputMethodManager inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(
                 this.getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
-        // gets data of the search
+
+        // executes user search
         EventAsyncTask asyncTask = new EventAsyncTask(this);
         asyncTask.execute(artist);
     }
@@ -232,26 +258,17 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    public ArrayList<Concert> getConcertList() {
-        return concertList;
-    }
-
     // set the click listeners for a normal click
     public void setListeners() {
 
-        // just a simple toast if short click
+        // just a simple toast if short click is done by user
         concertView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             // get page of movie by clicking on one of the movie names
             public void onItemClick(AdapterView parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), "long click for options", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Long click for options", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // go to accountactivity to sign in or sign up (FUNCTIENAAM MOET NOG WORDEN VERANDERD)
-    public void signUp(View view) {
-        Intent sendIntent = new Intent(getApplicationContext(), AccountActivity.class);
-        startActivity(sendIntent);
-    }
 }

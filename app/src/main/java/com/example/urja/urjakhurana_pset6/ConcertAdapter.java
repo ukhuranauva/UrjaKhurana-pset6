@@ -2,7 +2,6 @@ package com.example.urja.urjakhurana_pset6;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,13 +34,17 @@ public class ConcertAdapter extends ArrayAdapter<Concert> {
 
 
         View v = convertView;
-        // if the view is null
+        // if the view is null, create the view
         if (v == null) {
-            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) getContext()
+                                                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = inflater.inflate(R.layout.row_layout, null);
         }
+
         // get the proper concert object at the specific position
         Concert concert = concertList.get(position);
+
+        // if the concert object is not empty
         if (concert != null) {
             // get all the placeholders for the information and set it with the corresponding values
             TextView concertName = (TextView) v.findViewById(R.id.concertName);

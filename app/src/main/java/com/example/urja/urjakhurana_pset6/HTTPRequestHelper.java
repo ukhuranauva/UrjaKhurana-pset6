@@ -18,17 +18,10 @@ public class HTTPRequestHelper {
     protected static synchronized String downloadFromServer(String... params) {
         // initialize string for result
         String result = "";
-        // one part of the url
-        String url1 = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=thqTCO7jvSw" +
-                "CAsQ9Z4w6M4Ga3OMISAA7&keyword=";
-        // second part of url
-        String url2 = "&city=amsterdam";
-        // get name of artist
-        String title = params[0];
-        // combine url to get the right search url
-        String completeUrl = url1 + title + url2;
-        URL url = null;
+        // get the url to send a request to the api
+        String completeUrl = setUrl(params[0]);
 
+        URL url = null;
         // change string of url into a real URL for the request
         try {
             url = new URL(completeUrl);
@@ -59,6 +52,19 @@ public class HTTPRequestHelper {
             }
         }
         return result;
+    }
+
+    // given the value by the user, get the proper url for the api
+    private static String setUrl(String artist) {
+        // one part of the url
+        String url1 = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=thqTCO7jvSw" +
+                "CAsQ9Z4w6M4Ga3OMISAA7&keyword=";
+        // second part of url
+        String url2 = "&city=amsterdam";
+        // combine url to get the right search url
+        String completeUrl = url1 + artist + url2;
+
+        return completeUrl;
     }
 
 }
