@@ -5,10 +5,9 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:text="TextView"
-        android:textColor="#F5F5F5"
+        android:textColor="@color/colorPrimary"
         android:textAlignment="center"
-        android:textSize="17dp"
+        android:textSize="17sp"
         android:textAllCaps="true"
         android:textStyle="bold"
         android:layout_width="wrap_content"
@@ -25,13 +24,12 @@
         android:layout_below="@+id/concertName"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
-        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:id="@+id/image" />
 
     <TextView
-        android:text="TextView"
-        android:textColor="#F5F5F5"
+        android:textColor="@color/colorPrimary"
         android:textAlignment="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,8 +40,7 @@
         android:id="@+id/artist" />
 
     <TextView
-        android:text="TextView"
-        android:textColor="#F5F5F5"
+        android:textColor="@color/colorPrimary"
         android:textAlignment="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -53,8 +50,7 @@
         android:id="@+id/time" />
 
     <TextView
-        android:text="TextView"
-        android:textColor="#F5F5F5"
+        android:textColor="@color/colorPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toStartOf="@+id/time"
@@ -64,8 +60,7 @@
         android:id="@+id/date" />
 
     <TextView
-        android:text="TextView"
-        android:textColor="#F5F5F5"
+        android:textColor="@color/colorPrimary"
         android:textAlignment="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -78,8 +73,7 @@
         android:id="@+id/venue" />
 
     <TextView
-        android:text="TextView"
-        android:textColor="#F5F5F5"
+        android:textColor="@color/colorPrimary"
         android:textAlignment="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -90,8 +84,7 @@
         android:id="@+id/city" />
 
     <TextView
-        android:text="TextView"
-        android:textColor="#F5F5F5"
+        android:textColor="@color/colorPrimary"
         android:textAlignment="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -101,8 +94,7 @@
         android:id="@+id/country" />
 
     <TextView
-        android:text="TextView"
-        android:textColor="#F5F5F5"
+        android:textColor="@color/colorPrimary"
         android:textAlignment="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -112,8 +104,7 @@
         android:id="@+id/segment" />
 
     <TextView
-        android:text="TextView"
-        android:textColor="#F5F5F5"
+        android:textColor="@color/colorPrimary"
         android:textAlignment="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -26,7 +26,6 @@ public class AccountActivity extends AppCompatActivity {
     /** initialize variables used throughout */
     private FirebaseAuth mAuth;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,8 +34,6 @@ public class AccountActivity extends AppCompatActivity {
         // get the firebase authentication
         mAuth = FirebaseAuth.getInstance();
     }
-
-
 
     /** Creates new account */
     public void createAccount(View view) {

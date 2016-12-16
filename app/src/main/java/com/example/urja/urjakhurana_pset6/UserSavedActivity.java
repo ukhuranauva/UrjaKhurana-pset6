@@ -1,7 +1,6 @@
 package com.example.urja.urjakhurana_pset6;
 
 import android.app.AlertDialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -195,7 +194,7 @@ public class UserSavedActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError error) {
-                // Failed to read value
+                // failed to read value
                 Log.w("Error when reading", "Failed to read value.", error.toException());
             }
         });

@@ -38,7 +38,6 @@ public class ConcertAdapter extends ArrayAdapter<Concert> {
     @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent){
 
-
         View v = convertView;
 
         // if the view is null, create the view

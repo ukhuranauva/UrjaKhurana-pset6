@@ -2,28 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- "Mark Favorite", should appear as action button if possible -->
     <item
         android:id="@+id/action_account"
-        android:title="Account"
+        android:title="@string/account"
         app:showAsAction="never"
         android:visible="false"/>
 
-    <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_signout"
-        android:title="Sign Out"
+        android:title="@string/sign_out"
         app:showAsAction="never"
         android:visible="false"/>
 
-    <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_saved"
-        android:title="My Concerts"
+        android:title="@string/my_concerts"
         app:showAsAction="ifRoom"
         android:visible="false"/>
 
-    <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_search"
-        android:title="Search"
+        android:title="@string/search"
         app:showAsAction="ifRoom"
         android:visible="false"/>
 
