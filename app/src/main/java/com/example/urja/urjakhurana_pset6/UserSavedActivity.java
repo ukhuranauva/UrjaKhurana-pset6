@@ -1,7 +1,6 @@
 package com.example.urja.urjakhurana_pset6;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -28,13 +27,11 @@ import java.util.Arrays;
 
 public class UserSavedActivity extends AppCompatActivity {
 
-    ArrayList<Concert> concertList;
-    ArrayList<String> keyList;
-    ListView concertView;
-    ConcertAdapter adapter;
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    DatabaseReference myRef;
+    private ArrayList<Concert> concertList;
+    private ArrayList<String> keyList;
+    private ListView concertView;
+    private ConcertAdapter adapter;
+    private DatabaseReference myRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +75,7 @@ public class UserSavedActivity extends AppCompatActivity {
                     // add key and concert to the list
                     keyList.add(key);
                     concertList.add(concert);
-                    Log.d("heeke", concert.artist);
+                    Log.d("heeke", concert.getArtist());
                 }
                 adapter.notifyDataSetChanged();
             }
@@ -122,7 +119,11 @@ public class UserSavedActivity extends AppCompatActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
         // get inflater
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_item, menu);
+        inflater.inflate(R.menu.menu_items, menu);
+
+        // set title to delete since concert is already saved
+        MenuItem delete = menu.findItem(R.id.action_editDb);
+        delete.setTitle("DELETE");
     }
 
     // when one of the items of the floating context menu is tapped on
@@ -136,7 +137,7 @@ public class UserSavedActivity extends AppCompatActivity {
         switch (item.getItemId()) {
 
             // delete concert from saved concerts
-            case R.id.action_favorite:
+            case R.id.action_editDb:
                 Log.d("hello", Long.toString(info.id));
                 Log.d("concerts", Arrays.toString(concertList.toArray()));
                 Log.d("keys", Arrays.toString(keyList.toArray()));
@@ -154,11 +155,11 @@ public class UserSavedActivity extends AppCompatActivity {
                 return true;
 
             // share
-            case R.id.action_settings:
+            case R.id.action_share:
                 Log.d("hello", Long.toString(info.id));
                 // get which concert was tapped on and its url
                 concert = concertList.get((int) info.id);
-                String url = concert.url;
+                String url = concert.getUrl();
 
                 // choose which app user wants to share on and share the link of the concert
                 Intent sendIntent = new Intent();

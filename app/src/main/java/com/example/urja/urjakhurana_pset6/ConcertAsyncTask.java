@@ -1,6 +1,7 @@
 package com.example.urja.urjakhurana_pset6;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 import android.content.Context;
 
@@ -12,13 +13,13 @@ import java.util.ArrayList;
 
 /* In this class, with the help of an AsyncTask, the wanted data from the API is retrieved and
  * turned into a list of Concert objects to showcase to the user. */
-public class EventAsyncTask extends AsyncTask<String, Integer, String> {
+public class ConcertAsyncTask extends AsyncTask<String, Integer, String> {
 
     private MainActivity activity;
     private Context context;
 
-    // constructor for the EventAsyncTask
-    public EventAsyncTask(MainActivity activity) {
+    // constructor for the ConcertAsyncTask
+    public ConcertAsyncTask(MainActivity activity) {
         this.activity = activity;
         this.context = this.activity.getApplicationContext();
     }
@@ -44,31 +45,31 @@ public class EventAsyncTask extends AsyncTask<String, Integer, String> {
             // if there are results (the tag _embedded has all of the results in the json file)
             if (readObj.has("_embedded")) {
                 // get all the information of the movie from the json file
-                JSONArray eventArray = readObj.getJSONObject("_embedded").getJSONArray("events");
+                JSONArray concertArray = readObj.getJSONObject("_embedded").getJSONArray("events");
                 // for each concert, get all the information and add it to the list of concerts
-                for(int i = 0; i < eventArray.length(); i++) {
+                for(int i = 0; i < concertArray.length(); i++) {
                     // get a concert and all of its needed information
-                    JSONObject eventObj = eventArray.getJSONObject(i);
-                    String title = eventObj.getString("name");
-                    String id = eventObj.getString("id");
-                    String url = eventObj.getString("url");
-                    JSONArray images = eventObj.getJSONArray("images");
+                    JSONObject concertObj = concertArray.getJSONObject(i);
+                    String title = concertObj.getString("name");
+                    String id = concertObj.getString("id");
+                    String url = concertObj.getString("url");
+                    JSONArray images = concertObj.getJSONArray("images");
                     String imageUrl = images.getJSONObject(0).getString("url");
                     // get all the data regarding date and time
-                    JSONObject dates = eventObj.getJSONObject("dates").getJSONObject("start");
+                    JSONObject dates = concertObj.getJSONObject("dates").getJSONObject("start");
                     String date = dates.getString("localDate");
                     String time;
-                    // check if event has a time (because some don't)
+                    // check if concert has a time (because some don't)
                     if(dates.has("localTime")) {
                         time = dates.getString("localTime");
                     } else {
                         time = "undefined";
                     }
-                    JSONObject genres = eventObj.getJSONArray("classifications").getJSONObject(0);
+                    JSONObject genres = concertObj.getJSONArray("classifications").getJSONObject(0);
                     String segment = genres.getJSONObject("segment").getString("name");
                     String genre = genres.getJSONObject("genre").getString("name");
                     // get extra details of the concert
-                    JSONObject detailsObj = eventObj.getJSONObject("_embedded");
+                    JSONObject detailsObj = concertObj.getJSONObject("_embedded");
                     JSONObject venueObj = detailsObj.getJSONArray("venues").getJSONObject(0);
                     String venue;
                     // if venue has a name, get it or else set it equal to undefined
@@ -80,7 +81,7 @@ public class EventAsyncTask extends AsyncTask<String, Integer, String> {
                     String city = venueObj.getJSONObject("city").getString("name");
                     String country = venueObj.getJSONObject("country").getString("countryCode");
                     String artist = detailsObj.getJSONArray("attractions").getJSONObject(0)
-                                                                        .getString("name");
+                            .getString("name");
                     // create new Concert object and add it to the list of concerts
                     concert = new Concert(id, url, artist, title, city, country, segment, genre,
                             date, time, venue, imageUrl);

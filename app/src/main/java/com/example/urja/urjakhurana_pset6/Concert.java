@@ -7,19 +7,19 @@ package com.example.urja.urjakhurana_pset6;
 public class Concert {
 
     // initialize all variables
-    String id;
-    String url;
-    String artist;
-    String concertName;
-    String city;
-    String country;
-    String segment;
-    String genre;
-    String date;
-    String time;
-    String venue;
+    private String id;
+    private String url;
+    private String artist;
+    private String concertName;
+    private String city;
+    private String country;
+    private String segment;
+    private String genre;
+    private String date;
+    private String time;
+    private String venue;
     // url of image
-    String image;
+    private String image;
 
     // constructor with no arguments for when the data is fetched from Firebase
     public Concert() {
@@ -40,5 +40,53 @@ public class Concert {
         this.time = time;
         this.venue = venue;
         this.image = image;
+    }
+
+    public String getConcertId() {
+        return id;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public String getConcertName() {
+        return concertName;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public String getSegment() {
+        return segment;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public String getVenue() {
+        return venue;
     }
 }

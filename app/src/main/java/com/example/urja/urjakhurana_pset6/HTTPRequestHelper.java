@@ -55,16 +55,18 @@ public class HTTPRequestHelper {
     }
 
     // given the value by the user, get the proper url for the api
-    private static String setUrl(String artist) {
+    private static String setUrl(String query) {
+        String[] splitQuery = query.split(",");
+        String artist = splitQuery[0];
+        String city = splitQuery[1];
+
         // one part of the url
         String url1 = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=thqTCO7jvSw" +
                 "CAsQ9Z4w6M4Ga3OMISAA7&keyword=";
         // second part of url
-        String url2 = "&city=amsterdam";
+        String url2 = "&city=";
         // combine url to get the right search url
-        String completeUrl = url1 + artist + url2;
-
-        return completeUrl;
+        return url1 + artist + url2 + city;
     }
 
 }

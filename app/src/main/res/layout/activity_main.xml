@@ -5,10 +5,6 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:clipToPadding="false"
     android:background="#424242"
     tools:context="com.example.urja.urjakhurana_pset6.MainActivity">
@@ -18,10 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#2196F3"
-        android:clipToPadding="false"
-        android:layout_marginTop ="-17dp"
-        android:layout_marginLeft="-17dp"
-        android:layout_marginRight="-17dp"
         app:titleTextColor="#F5F5F5"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
@@ -34,14 +26,20 @@
         android:layout_toStartOf="@+id/button"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:inputType="textPersonName"
         android:textColorHint="#F5F5F5"
         android:textColor="#F5F5F5"
         android:textColorHighlight="#F5F5F5"
-        android:hint="type in an artist...."
-        android:id="@+id/searchEvent" />
+        android:hint="example input: artist, city"
+        android:id="@+id/searchConcert" />
 
     <Button
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:text="Search"
         android:background="#2196F3"
         android:textColor="#F5F5F5"
@@ -49,7 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:onClick="searchEvent"
+        android:onClick="searchConcert"
         android:id="@+id/button" />
 
     <ListView
@@ -57,6 +55,9 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/button"
         android:layout_below="@+id/my_toolbar"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
         android:id="@+id/concertView" />
 
 
