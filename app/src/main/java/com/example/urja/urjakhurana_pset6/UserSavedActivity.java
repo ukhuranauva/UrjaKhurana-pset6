@@ -42,7 +42,6 @@ public class UserSavedActivity extends AppCompatActivity {
     private ListView concertView;
     private ConcertAdapter adapter;
     private DatabaseReference myRef;
-    private String flag = "no";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

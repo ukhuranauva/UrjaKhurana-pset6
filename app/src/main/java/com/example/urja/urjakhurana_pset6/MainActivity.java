@@ -254,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
                 // get which concert it is and save it to database
                 concert = concertList.get((int) info.id);
                 myRef.push().setValue(concert);
+                Toast.makeText(getApplicationContext(), "Saved Concert", Toast.LENGTH_SHORT).show();
                 return true;
 
             // share option
@@ -331,7 +332,8 @@ public class MainActivity extends AppCompatActivity {
          * is done for user convenience
          */
         Context context = getApplicationContext();
-        InputMethodManager inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager inputManager = (InputMethodManager)
+                context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(
                 this.getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
