@@ -25,8 +25,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/*
+ * Urja Khurana, 10739947
+ * In this activity, the user can look at their saved concerts (the concerts they would like to go
+ * or they are actually going to). The user can also share a concert with whoever they want and also
+ * delete a concert if they don't want to go there for example.
+ */
+
 public class UserSavedActivity extends AppCompatActivity {
 
+    // initialize variables
     private ArrayList<Concert> concertList;
     private ArrayList<String> keyList;
     private ListView concertView;
@@ -46,73 +54,27 @@ public class UserSavedActivity extends AppCompatActivity {
         concertList = new ArrayList<>();
         keyList = new ArrayList<>();
         concertView = (ListView) findViewById(R.id.concertView);
+
+        // set adapter
         adapter = new ConcertAdapter(this, R.layout.row_layout, concertList);
         concertView.setAdapter(adapter);
+
+        // get floating context menu for the listview items
         registerForContextMenu(concertView);
 
         // set listener for listview
         setListeners();
 
+        String userId = getCurrentUser();
         // initialize database at the proper node for the user to get access to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        String userId = getCurrentUser();
         myRef = database.getReference("users").child(userId);
 
         // get the saved concert from the data
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("HOI IK GA ER IN", "HOPELIJK NIET WEER");
-                // this is to prevent the addition of already displayed concerts at each datachange
-                concertList.clear();
-
-                // get all of the concerts
-                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
-                    // get concert and key of concert in database
-                    String key = snapshot.getKey();
-                    Concert concert = snapshot.getValue(Concert.class);
-
-                    // add key and concert to the list
-                    keyList.add(key);
-                    concertList.add(concert);
-                    Log.d("heeke", concert.getArtist());
-                }
-                adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w("sksksk", "Failed to read value.", error.toException());
-            }
-        });
+        getDatabaseData();
     }
 
-    // set listener on listview items
-    public void setListeners() {
-
-        // just a simple toast if short click
-        concertView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            // get page of movie by clicking on one of the movie names
-            public void onItemClick(AdapterView parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), "Long click for options", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    // get id of current user
-    public String getCurrentUser() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String uid = "";
-        if (user != null) {
-            // get id of current user
-            uid = user.getUid();
-        }
-        return uid;
-    }
-
-    // when the floating context menu is created
+    /** When the floating context menu is created */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
@@ -123,10 +85,10 @@ public class UserSavedActivity extends AppCompatActivity {
 
         // set title to delete since concert is already saved
         MenuItem delete = menu.findItem(R.id.action_editDb);
-        delete.setTitle("DELETE");
+        delete.setTitle("Delete");
     }
 
-    // when one of the items of the floating context menu is tapped on
+    /** When one of the items of the floating context menu is tapped on, handle proper action */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         // get which item of the listview has been tapped on
@@ -135,13 +97,8 @@ public class UserSavedActivity extends AppCompatActivity {
 
         // based on which option was tapped
         switch (item.getItemId()) {
-
             // delete concert from saved concerts
             case R.id.action_editDb:
-                Log.d("hello", Long.toString(info.id));
-                Log.d("concerts", Arrays.toString(concertList.toArray()));
-                Log.d("keys", Arrays.toString(keyList.toArray()));
-
                 // get concert and the corresponding key
                 concert = concertList.get((int) info.id);
                 String key = keyList.get((int) info.id);
@@ -151,12 +108,10 @@ public class UserSavedActivity extends AppCompatActivity {
                 adapter.remove(concert);
                 concertList.remove(concert);
                 adapter.notifyDataSetChanged();
-                Log.d("listen", "i'm pised");
                 return true;
 
             // share
             case R.id.action_share:
-                Log.d("hello", Long.toString(info.id));
                 // get which concert was tapped on and its url
                 concert = concertList.get((int) info.id);
                 String url = concert.getUrl();
@@ -168,12 +123,14 @@ public class UserSavedActivity extends AppCompatActivity {
                 sendIntent.setType("text/plain");
                 startActivity(Intent.createChooser(sendIntent, "Choose an application to share"));
                 return true;
+
+            // when user's action is not recognized
             default:
                 return super.onContextItemSelected(item);
         }
     }
 
-    // when options in the toolbar are created
+    /** Create toolbar menu and showcase the proper options */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // inflate menu
@@ -190,7 +147,7 @@ public class UserSavedActivity extends AppCompatActivity {
         return true;
     }
 
-    // when one of the options in the toolbar is tapped on by the user
+    /** When one of the options in the toolbar is tapped on by the user */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // based on which option has been tapped
@@ -201,6 +158,7 @@ public class UserSavedActivity extends AppCompatActivity {
                 FirebaseAuth.getInstance().signOut();
                 // reset options because user signed out
                 invalidateOptionsMenu();
+                // close activity since there is no user so no saved data
                 finish();
                 return true;
 
@@ -217,5 +175,58 @@ public class UserSavedActivity extends AppCompatActivity {
                 // superclass
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    /** Get all of the saved concerts of the user from the firebase database */
+    private void getDatabaseData() {
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // this is to prevent the addition of already displayed concerts at each datachange
+                concertList.clear();
+
+                // get all of the concerts
+                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                    // get concert and key of concert in database (keys will be used to delete)
+                    String key = snapshot.getKey();
+                    Concert concert = snapshot.getValue(Concert.class);
+
+                    // add key and concert to the list
+                    keyList.add(key);
+                    concertList.add(concert);
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("Error when reading", "Failed to read value.", error.toException());
+            }
+        });
+    }
+
+    /** set listener on listview items */
+    public void setListeners() {
+        // just a simple toast if short click to inform the user the long click
+        concertView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            // get page of movie by clicking on one of the movie names
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(), "Long click for options", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**  Get id of current user. If no one's signed in, just return "" */
+    public String getCurrentUser() {
+        // get current user
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = "";
+        if (user != null) {
+            // get id of current user
+            uid = user.getUid();
+        }
+        return uid;
     }
 }

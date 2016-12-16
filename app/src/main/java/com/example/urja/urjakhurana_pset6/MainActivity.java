@@ -26,11 +26,14 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
-/* In the MainActivity a user can search for concerts by their favorite artist, regardless of being
- *  signed in or not. However, being signed in has its' perks because then you can not only share
- *  a concert with your friends, but you can also save the concerts! When a user is not signed in
- *  you can share concerts, however you cannot save any concerts.
+/*
+ * Urja Khurana, 10739947
+ * In the MainActivity a user can search for concerts by their favorite artist, regardless of being
+ * signed in or not. However, being signed in has its' perks because then you can not only share
+ * a concert with your friends, but you can also save the concerts! When a user is not signed in
+ * you can share concerts, however you cannot save any concerts.
  */
+
 public class MainActivity extends AppCompatActivity {
 
     // initialize variables
@@ -54,112 +57,98 @@ public class MainActivity extends AppCompatActivity {
         // assign values to initialized variables
         concertList = new ArrayList<>();
         concertView = (ListView) findViewById(R.id.concertView);
+
+        // set adapter
         adapter = new ConcertAdapter(this, R.layout.row_layout, concertList);
         concertView.setAdapter(adapter);
-        // add listener for list view
+
+        // add listener for the list view
         setListeners();
+
         // get the floating context menu for the listview items
         registerForContextMenu(concertView);
 
         // initialize firebase authentication
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d("k", "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d("n", "onAuthStateChanged:signed_out");
-                }
-                // ...
-            }
-        };
+        setFirebaseAuthentication();
 
-        // get firebase database
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        // get user id
+        // get user id of the current user (will be null if no one is signed in)
         String userId = getCurrentUser();
-        // get the right path of the user to perform operations on their own database
+        // get the right path of the user to perform operations on their own database items
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
         myRef = database.getReference("users").child(userId);
-
-        // get last search query
-        SharedPreferences prefs = this.getSharedPreferences("settings", this.MODE_PRIVATE);
-        String lastQuery = prefs.getString("query", "");
-        EditText searchBar = (EditText) findViewById(R.id.searchConcert);
-        searchBar.setText(lastQuery);
     }
 
-    // add listener for authentication of account on start
+    /*
+     * Add listener for authentication of account and reload user's search before exiting the app
+     * on start of the activity for user convenience.
+     */
     @Override
     public void onStart() {
         super.onStart();
+        // add listener for authentication
         mAuth.addAuthStateListener(mAuthListener);
+
+        // get the last search of the user from Shared Preferences and set it on the searchbar
         SharedPreferences prefs = this.getSharedPreferences("settings", this.MODE_PRIVATE);
-        String lastQuery = prefs.getString("query", "");
-        lastSearch = lastQuery;
+        lastSearch = prefs.getString("query", "");
         EditText searchBar = (EditText) findViewById(R.id.searchConcert);
-        searchBar.setText(lastQuery);
-        // executes user search
-        if(lastQuery.contains(",") && lastQuery.split(",").length > 1) {
+        searchBar.setText(lastSearch);
+
+        // execute user search, only if the query is in the valid format
+        if(lastSearch.contains(",") && lastSearch.split(",").length > 1) {
             ConcertAsyncTask asyncTask = new ConcertAsyncTask(this);
-            asyncTask.execute(lastQuery);
+            asyncTask.execute(lastSearch);
         } else {
+            // inform user of invalid search format
             Toast.makeText(getApplicationContext(), "Please give a valid search query!",
                     Toast.LENGTH_SHORT).show();
         }
     }
 
-    // remove listener for authentication of account when app is stopped
+    /** Remove listener for authentication of account and save last query when app is stopped. */
     @Override
     public void onStop() {
+        // save last query in sharedpreferences
         SharedPreferences prefs = this.getSharedPreferences("settings", this.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("query", lastSearch);
         editor.commit();
         super.onStop();
+
+        // remove listener
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
 
+    /** Save the last query of the user for the rotation, so search results can be showcased again */
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putString("query", lastSearch);
         super.onSaveInstanceState(outState);
     }
 
+    /** When screen has been rotated, showcase the search results again. */
     @Override
     public void onRestoreInstanceState(Bundle inState) {
-        // get saved story back once activity is restarted
         super.onRestoreInstanceState(inState);
+
+        // get query that was last searched for before the rotation
         lastSearch = inState.getString("query");
-        // sets the right placeholder as hint (otherwise a different placeholder is shown)
-        EditText searchBar = (EditText) findViewById(R.id.searchConcert);
-        searchBar.setText(lastSearch);
-        // executes user search
+
+        /*
+         * Executes user search if it was a valid query so if it contains a comma and is not
+         * something like: artist,
+         */
         if(lastSearch.contains(",") && lastSearch.split(",").length > 1) {
             ConcertAsyncTask asyncTask = new ConcertAsyncTask(this);
             asyncTask.execute(lastSearch);
         } else {
+            // inform the user to give proper query
             Toast.makeText(getApplicationContext(), "Please give a valid search query!",
                                                                     Toast.LENGTH_SHORT).show();
         }
     }
-
-    // get user id of the current user
-    public String getCurrentUser() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String uid = "";
-        if (user != null) {
-            // get user id of the current user
-            uid = user.getUid();
-        }
-        return uid;
-    }
-
 
 
     /* Was able to solve this with a bit of help from the following link:
@@ -193,15 +182,15 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    // this function is for when one of the items in the toolbar is tapped on by the user
+    /** This function is for when one of the items in the toolbar is tapped on by the user */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             // log in or make account
             case R.id.action_account:
                 // go to activity to sign in or sign up
-                Intent sendIntent = new Intent(getApplicationContext(), AccountActivity.class);
-                startActivity(sendIntent);
+                Intent goToAccount = new Intent(getApplicationContext(), AccountActivity.class);
+                startActivity(goToAccount);
                 return true;
 
             // sign out
@@ -227,7 +216,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // inflate the floating context menu for the listview items
+    /*
+     * inflate the floating context menu for the listview items and showcase correct items
+     * based on the fact if the user is signed in or not
+     */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
@@ -248,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // when one of the options of the context menu are tapped on
+    /** When one of the options of the context menu are tapped on */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         // get the proper item that was tapped on
@@ -259,19 +251,17 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // save concert
             case R.id.action_editDb:
-                Log.d("hello", Long.toString(info.id));
                 // get which concert it is and save it to database
                 concert = concertList.get((int) info.id);
                 myRef.push().setValue(concert);
-                Log.d("listen", "i'm pised");
                 return true;
 
             // share option
             case R.id.action_share:
-                Log.d("hello", Long.toString(info.id));
-                // get the concert and its url on the website
+                // get the concert and its url
                 concert = concertList.get((int) info.id);
                 String url = concert.getUrl();
+
                 // get which app user wants to use for sharing the url and share it there
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
@@ -286,55 +276,97 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // searches for a concert, given the artist and city by the user
+    /** Get user id of the current user. If the user is not logged in, just return "". */
+    public String getCurrentUser() {
+        // get current firebase user
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = "";
+
+        // if someone is signed in
+        if (user != null) {
+            // get user id of the current user
+            uid = user.getUid();
+        }
+        return uid;
+    }
+
+    /** Set the firebase authentication methods */
+    private void setFirebaseAuthentication() {
+        // get the firebase authentication
+        mAuth = FirebaseAuth.getInstance();
+
+        // set the listener
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Toast.makeText(getApplicationContext(), "Welcome!",
+                            Toast.LENGTH_SHORT).show();
+                    Log.d("logged in", "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signing out
+                    Toast.makeText(getApplicationContext(), "Bye, see you soon!",
+                            Toast.LENGTH_SHORT).show();
+                    Log.d("logged out", "onAuthStateChanged:signed_out");
+                }
+            }
+        };
+    }
+
+    /** Searches for a concert, given the artist and city by the user */
     public void searchConcert(View view) {
+        // get query of user and set it as the last search for if the app is closed after
         EditText query = (EditText) findViewById(R.id.searchConcert);
         String searchQuery = query.getText().toString();
         lastSearch = searchQuery;
 
-        // refresh the searchbar for the next search of the user
+        // refresh the searchbar for the next search of the user (user convenience)
         query.setText("");
 
-        Context context = getApplicationContext();
-
-        /* Made use of http://stackoverflow.com/questions/2342620/how-to-hide-keyboard-after-
+        /*
+         * Made use of http://stackoverflow.com/questions/2342620/how-to-hide-keyboard-after-
          * typing-in-edittext-in-android to hide the keyboard after a concert is searched for. this
          * is done for user convenience
          */
+        Context context = getApplicationContext();
         InputMethodManager inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(
                 this.getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
 
-        // executes user search
+        // executes user search only if the proper query convention is used
         if(searchQuery.contains(",") && searchQuery.split(",").length > 1) {
             ConcertAsyncTask asyncTask = new ConcertAsyncTask(this);
             asyncTask.execute(searchQuery);
         } else {
+            // inform user to give a proper query
             Toast.makeText(context, "Please give a valid search query!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    // sets the results of the search
+    /** Sets the results of the search in the listview */
     public void setData(ArrayList<Concert> concerts) {
         // delete the old results
         adapter.clear();
+
         // showcase new results
         adapter.addAll(concerts);
         adapter.notifyDataSetChanged();
     }
 
-    // set the click listeners for a normal click
+    /** Set the click listeners for a normal click */
     public void setListeners() {
 
-        // just a simple toast if short click is done by user
+        // just a simple toast if short click is done by user, since long click showcases options
         concertView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             // get page of movie by clicking on one of the movie names
             public void onItemClick(AdapterView parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), "Long click for options", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Long click for options",
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
-
 }

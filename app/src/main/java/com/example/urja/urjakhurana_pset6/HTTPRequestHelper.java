@@ -1,10 +1,5 @@
 package com.example.urja.urjakhurana_pset6;
 
-/* The HTTPRequestHelper makes a call to the API to get the request and get corresponding
- * information, according to the given artist name by the user in the main activity. */
-
-import android.util.Log;
-
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -12,9 +7,16 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
+/*
+ * Urja Khurana, 10739947
+ * The HTTPRequestHelper makes a call to the API to get the request and get corresponding
+ * information, according to the given query by the user in the main activity.
+ * The following API is used: http://developer.ticketmaster.com/products-and-docs/apis/discovery/v2/
+ */
+
 public class HTTPRequestHelper {
 
-    // gets result of request to api
+    /** Gets result of request to API, so what is given back */
     protected static synchronized String downloadFromServer(String... params) {
         // initialize string for result
         String result = "";
@@ -36,6 +38,7 @@ public class HTTPRequestHelper {
                 connection.setRequestMethod("GET");
                 // right or wrong answer
                 Integer responseCode = connection.getResponseCode();
+                // if a proper response is given
                 if (200 <= responseCode && responseCode <= 299) {
                     // read result of search query
                     BufferedReader bf = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -44,7 +47,7 @@ public class HTTPRequestHelper {
                         result = result + line;
                     }
                 } else {
-                    Log.d("hehehe", "hohohoo");
+                    // read result of error
                     BufferedReader bf = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
                 }
             } catch (IOException e) {
@@ -54,7 +57,7 @@ public class HTTPRequestHelper {
         return result;
     }
 
-    // given the value by the user, get the proper url for the api
+    /** given the value by the user, get the proper url for the api */
     private static String setUrl(String query) {
         String[] splitQuery = query.split(",");
         String artist = splitQuery[0];

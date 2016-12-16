@@ -1,6 +1,8 @@
 package com.example.urja.urjakhurana_pset6;
 
-/* The Concert object consist of all the information that is relevant for the user regarding a
+/*
+ * Urja Khurana, 10739947
+ * The Concert object consist of all the information that is relevant for the user regarding a
  * concert. So that is the id, url, artist, location, type of concert and date for example.
  */
 
@@ -21,11 +23,11 @@ public class Concert {
     // url of image
     private String image;
 
-    // constructor with no arguments for when the data is fetched from Firebase
+    /** Constructor with no arguments for when the data is fetched from Firebase */
     public Concert() {
     }
 
-    // constructor for when a new object has to be made with all of the information
+    /** Constructor for when a new object has to be made with all of the information */
     public Concert(String id, String url, String artist, String concertName, String city, String
                    country, String segment, String genre, String date, String time, String venue, String image) {
         this.id = id;
@@ -41,6 +43,8 @@ public class Concert {
         this.venue = venue;
         this.image = image;
     }
+
+    /** All of the getters for the variables of the object */
 
     public String getConcertId() {
         return id;
