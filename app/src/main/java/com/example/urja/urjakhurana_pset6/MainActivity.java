@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(mAuthListener);
 
         // get the last search of the user from Shared Preferences and set it on the searchbar
-        SharedPreferences prefs = this.getSharedPreferences("settings", this.MODE_PRIVATE);
+        SharedPreferences prefs = this.getSharedPreferences("settings", MODE_PRIVATE);
         lastSearch = prefs.getString("query", "");
         EditText searchBar = (EditText) findViewById(R.id.searchConcert);
         searchBar.setText(lastSearch);
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         // save last query in sharedpreferences
-        SharedPreferences prefs = this.getSharedPreferences("settings", this.MODE_PRIVATE);
+        SharedPreferences prefs = this.getSharedPreferences("settings", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("query", lastSearch);
         editor.commit();
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
          * Executes user search if it was a valid query so if it contains a comma and is not
          * something like: artist,
          */
-        if(lastSearch.contains(",") && lastSearch.split(",").length > 1) {
+        if(lastSearch!= null && lastSearch.contains(",") && lastSearch.split(",").length > 1) {
             ConcertAsyncTask asyncTask = new ConcertAsyncTask(this);
             asyncTask.execute(lastSearch);
         } else {
@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
                                     ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_items, menu);
+        inflater.inflate(R.menu.concert_items, menu);
 
         MenuItem save = menu.findItem(R.id.action_editDb);
 
@@ -307,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("logged in", "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
                     // User is signing out
-                    Toast.makeText(getApplicationContext(), "Bye, see you soon!",
+                    Toast.makeText(getApplicationContext(), "Please sign in to save concerts!",
                             Toast.LENGTH_SHORT).show();
                     Log.d("logged out", "onAuthStateChanged:signed_out");
                 }

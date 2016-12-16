@@ -23,7 +23,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /*
  * Urja Khurana, 10739947
@@ -81,7 +80,7 @@ public class UserSavedActivity extends AppCompatActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
         // get inflater
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_items, menu);
+        inflater.inflate(R.menu.concert_items, menu);
 
         // set title to delete since concert is already saved
         MenuItem delete = menu.findItem(R.id.action_editDb);
