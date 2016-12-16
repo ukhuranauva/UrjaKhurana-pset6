@@ -150,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     /* Was able to solve this with a bit of help from the following link:
      * http://stackoverflow.com/questions/10692755/how-do-i-hide-a-menu-item-in-the-actionbar
      * Checks if a user is logged in or not, depending on that it displays the right options in
@@ -214,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
     /*
      * inflate the floating context menu for the listview items and showcase correct items
@@ -303,13 +301,9 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    Toast.makeText(getApplicationContext(), "Welcome!",
-                            Toast.LENGTH_SHORT).show();
                     Log.d("logged in", "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
-                    // User is signing out
-                    Toast.makeText(getApplicationContext(), "Please sign in to save concerts!",
-                            Toast.LENGTH_SHORT).show();
+                    // User is signed out
                     Log.d("logged out", "onAuthStateChanged:signed_out");
                 }
             }
