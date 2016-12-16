@@ -6,6 +6,6 @@ them when you've been to the concert. Accidentally tapped on the delete button? 
 to delete. We even remember the last search you have done, so whenever you close the app and restart, you can see your last query results! 
 So, have fun searching for concerts!
 <br />
-Image 1: Search results of: Ariana Grande, Amsterdam. Image 2: Saved concerts 
+Image 1: Search results of: Ariana Grande, Amsterdam. Image 2: Saved concerts <br /><br />
 <img src="https://cloud.githubusercontent.com/assets/10434310/21277441/a788acb4-c3d6-11e6-95ca-e8d9d7ae2865.png" width="200">
 <img src="https://cloud.githubusercontent.com/assets/10434310/21277442/a78eb4c4-c3d6-11e6-8411-bdce1ca950eb.png" width="200">
