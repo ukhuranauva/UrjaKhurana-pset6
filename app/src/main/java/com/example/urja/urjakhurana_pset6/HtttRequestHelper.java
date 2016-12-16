@@ -9,7 +9,7 @@ import java.io.IOException;
 
 /*
  * Urja Khurana, 10739947
- * The HttpRequestHelper makes a call to the API to get the request and get the corresponding
+ * The HttpRequestHelper makes a call to the API to get the request and get corresponding
  * information, according to the given query by the user in the main activity.
  * The following API is used: http://developer.ticketmaster.com/products-and-docs/apis/discovery/v2/
  */

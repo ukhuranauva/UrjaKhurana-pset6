@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 /*
  * Urja Khurana, 10739947
- * In this class, with the help of an AsyncTask, the wanted data from the API is retrieved and
+ * In this class, with the help of the AsyncTask, the wanted data from API is retrieved and
  * turned into a list of Concert objects to showcase to the user.
  */
 
