@@ -14,7 +14,7 @@ import java.io.IOException;
  * The following API is used: http://developer.ticketmaster.com/products-and-docs/apis/discovery/v2/
  */
 
-public class HtttRequestHelper {
+public class HttpRequestHelper {
 
     /** Gets result of request to API, so what is given back */
     protected static synchronized String downloadFromServer(String... params) {
