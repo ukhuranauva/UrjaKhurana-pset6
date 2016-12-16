@@ -35,7 +35,7 @@ public class ConcertAsyncTask extends AsyncTask<String, Integer, String> {
 
     /** Get results of request to api */
     protected String doInBackground(String... params) {
-        return HttpRequestHelper.downloadFromServer(params);
+        return HtttRequestHelper.downloadFromServer(params);
     }
 
     /** Parse results from API and turn them into concert object to showcase to the user */

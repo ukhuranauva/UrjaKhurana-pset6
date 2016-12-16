@@ -9,12 +9,12 @@ import java.io.IOException;
 
 /*
  * Urja Khurana, 10739947
- * The HTTPRequestHelper makes a call to the API to get the request and get corresponding
+ * The HttpRequestHelper makes a call to the API to get the request and get the corresponding
  * information, according to the given query by the user in the main activity.
  * The following API is used: http://developer.ticketmaster.com/products-and-docs/apis/discovery/v2/
  */
 
-public class HTTPRequestHelper {
+public class HtttRequestHelper {
 
     /** Gets result of request to API, so what is given back */
     protected static synchronized String downloadFromServer(String... params) {
@@ -41,14 +41,16 @@ public class HTTPRequestHelper {
                 // if a proper response is given
                 if (200 <= responseCode && responseCode <= 299) {
                     // read result of search query
-                    BufferedReader bf = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    BufferedReader bf = new BufferedReader(new
+                            InputStreamReader(connection.getInputStream()));
                     String line;
                     while ((line = bf.readLine()) != null) {
                         result = result + line;
                     }
                 } else {
                     // read result of error
-                    BufferedReader bf = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                    BufferedReader bf = new BufferedReader(new
+                            InputStreamReader(connection.getErrorStream()));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -73,3 +75,4 @@ public class HTTPRequestHelper {
     }
 
 }
+
