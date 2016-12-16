@@ -1,5 +1,8 @@
 package com.example.urja.urjakhurana_pset6;
 
+import android.app.AlertDialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,6 +42,7 @@ public class UserSavedActivity extends AppCompatActivity {
     private ListView concertView;
     private ConcertAdapter adapter;
     private DatabaseReference myRef;
+    private String flag = "no";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,15 +102,8 @@ public class UserSavedActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // delete concert from saved concerts
             case R.id.action_editDb:
-                // get concert and the corresponding key
-                concert = concertList.get((int) info.id);
-                String key = keyList.get((int) info.id);
-
-                // delete from database and update list shown to user
-                myRef.child(key).removeValue();
-                adapter.remove(concert);
-                concertList.remove(concert);
-                adapter.notifyDataSetChanged();
+                // given the position of the concert, delete the concert with consent of the user
+                deletionAlertDialog((int) info.id);
                 return true;
 
             // share
@@ -205,7 +202,7 @@ public class UserSavedActivity extends AppCompatActivity {
         });
     }
 
-    /** set listener on listview items */
+    /** Set listener on listview items */
     public void setListeners() {
         // just a simple toast if short click to inform the user the long click
         concertView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -227,5 +224,45 @@ public class UserSavedActivity extends AppCompatActivity {
             uid = user.getUid();
         }
         return uid;
+    }
+
+    /* Asks the user if they are sure about their choice to delete a concert since. If user says
+     * yes, then the concert gets deleted from the database. If the user says no, then nothing
+     * happens. This is done for user convenience
+     */
+    public void deletionAlertDialog(final int index) {
+        // get an alertdialog builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // set message and title of the dialog
+        builder.setMessage("Are you sure you want to delete?").setTitle("Deletion concert");
+        // add the buttons
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            // when user clicks 'yes', delete it
+            public void onClick(DialogInterface dialog, int id) {
+                // get concert and the corresponding key
+                Concert concert = concertList.get(index);
+                String key = keyList.get(index);
+
+                // delete from database and update list shown to user
+                myRef.child(key).removeValue();
+                adapter.remove(concert);
+                concertList.remove(concert);
+                adapter.notifyDataSetChanged();
+
+                // show toast to inform user
+                Toast.makeText(getApplicationContext(), "Deleted", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            // when user clicks 'no', do nothing
+            public void onClick(DialogInterface dialog, int id) {
+                // user cancelled the dialog
+            }
+        });
+
+        // create and show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
